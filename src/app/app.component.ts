@@ -36,15 +36,18 @@ export class App {
   DELETE_tarefa(tarefaParaRemover: Tarefa) {
     if (!tarefaParaRemover._id) return;
 
+    // Atualização otimista: remove da UI imediatamente
+    this.arrayDeTarefas = this.arrayDeTarefas.filter(
+      t => t._id !== tarefaParaRemover._id
+    );
+
     this.tarefaService.delete(tarefaParaRemover._id).subscribe({
-      next: () => {
-        this.arrayDeTarefas = this.arrayDeTarefas.filter(
-          t => t._id !== tarefaParaRemover._id
-        );
-      },
+      next: () => {},
       error: (err) => {
         console.error('Erro ao remover tarefa:', err);
         this.erro = 'Não foi possível remover a tarefa.';
+        // Restaura o item se falhar
+        this.arrayDeTarefas = [...this.arrayDeTarefas, tarefaParaRemover];
       }
     });
   }
