@@ -54,10 +54,9 @@ export class App {
 
     this.tarefaService.update(tarefa._id, { descricao: novaDescricao }).subscribe({
       next: (tarefaAtualizada) => {
-        const index = this.arrayDeTarefas.findIndex(t => t._id === tarefa._id);
-        if (index !== -1) {
-          this.arrayDeTarefas[index] = tarefaAtualizada;
-        }
+        this.arrayDeTarefas = this.arrayDeTarefas.map(t =>
+          t._id === tarefa._id ? tarefaAtualizada : t
+        );
       },
       error: (err) => {
         console.error('Erro ao atualizar tarefa:', err);
