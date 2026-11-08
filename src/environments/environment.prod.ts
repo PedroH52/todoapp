@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://SEU-APP.onrender.com/api'
+  apiUrl: 'https://todoapp-api-00uh.onrender.com/api'
 };
