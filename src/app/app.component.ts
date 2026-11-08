@@ -25,14 +25,25 @@ export class App implements OnInit {
   CREATE_tarefa(descricaoNovaTarefa: string) {
     if (!descricaoNovaTarefa.trim()) return;
 
+    // Atualização otimista: adiciona na UI imediatamente
+    const tarefaTemp = new Tarefa(descricaoNovaTarefa, false);
+    this.arrayDeTarefas = [tarefaTemp, ...this.arrayDeTarefas];
+
     this.tarefaService.create(descricaoNovaTarefa).subscribe({
       next: (novaTarefa) => {
-        this.arrayDeTarefas.unshift(novaTarefa);
+        // Substitui a tarefa temporária pela real (com _id do MongoDB)
+        this.arrayDeTarefas = this.arrayDeTarefas.map(t =>
+          t === tarefaTemp ? novaTarefa : t
+        );
       },
       error: (err) => {
         console.error('Erro ao criar tarefa:', err);
         this.erro = 'Não foi possível adicionar a tarefa.';
+        // Remove a tarefa temporária se falhar
+        this.arrayDeTarefas = this.arrayDeTarefas.filter(t => t !== tarefaTemp);
       }
+    });
+  }
     });
   }
 
