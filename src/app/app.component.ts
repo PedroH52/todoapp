@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Tarefa } from './tarefa';
 import { TarefaService } from './tarefa.service';
+import { retry } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -8,14 +9,16 @@ import { TarefaService } from './tarefa.service';
   standalone: false,
   styleUrl: './app.component.css'
 })
-export class App {
+export class App implements OnInit {
   protected readonly title = signal('TODOapp');
 
   arrayDeTarefas: Tarefa[] = [];
   carregando = false;
   erro: string | null = null;
 
-  constructor(private tarefaService: TarefaService) {
+  constructor(private tarefaService: TarefaService) {}
+
+  ngOnInit() {
     this.READ_tarefas();
   }
 
@@ -86,14 +89,17 @@ export class App {
 
   READ_tarefas() {
     this.carregando = true;
-    this.tarefaService.getAll().subscribe({
+    this.erro = null;
+    this.tarefaService.getAll().pipe(
+      retry({ count: 3, delay: 5000 })
+    ).subscribe({
       next: (tarefas) => {
         this.arrayDeTarefas = tarefas;
         this.carregando = false;
       },
       error: (err) => {
         console.error('Erro ao carregar tarefas:', err);
-        this.erro = 'Não foi possível conectar à API.';
+        this.erro = 'Não foi possível conectar à API. Tente recarregar a página.';
         this.carregando = false;
       }
     });
