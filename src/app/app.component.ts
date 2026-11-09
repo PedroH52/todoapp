@@ -44,8 +44,6 @@ export class App implements OnInit {
       }
     });
   }
-    });
-  }
 
   DELETE_tarefa(tarefaParaRemover: Tarefa) {
     if (!tarefaParaRemover._id) return;
